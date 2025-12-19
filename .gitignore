@@ -38,3 +38,6 @@ node_modules/
 
 # UI dist folder
 src/financial_command_center/__dist__/
+
+# IDE
+.cursor/
