@@ -31,6 +31,7 @@ export function FinancialHealthContent() {
   const [selectedFfrdcId, setSelectedFfrdcId] = useState<string | null>(null);
 
   const { data } = useFinancialHealthSnapshotSuspense({ timeWindow });
+  const today = new Date();
 
   const handleKpiClick = (kpiId: string) => {
     setSelectedKpiId(kpiId);
@@ -59,7 +60,7 @@ export function FinancialHealthContent() {
             Financial Health Snapshot
           </h1>
           <p className="text-muted-foreground mt-1">
-            Mission-aligned financial stewardship across six FFRDCs
+            Mission-aligned Financial Stewardship
           </p>
         </div>
 
@@ -96,7 +97,7 @@ export function FinancialHealthContent() {
           {/* As-of Date */}
           <Badge variant="outline" className="gap-1.5 py-1.5">
             <Calendar className="h-3.5 w-3.5" />
-            As of {new Date(data.asOfDate).toLocaleDateString("en-US", {
+            As of {today.toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",
               year: "numeric",
@@ -116,59 +117,52 @@ export function FinancialHealthContent() {
         ))}
       </div>
 
-      {/* Charts and Signals Grid */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Main Charts - 2 columns */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Revenue vs Budget */}
-          <RevenueVsBudgetChart
-            data={data.revenueBudget}
-            onBarClick={(ffrdcId) => handleChartClick(ffrdcId, "ytd-revenue")}
+      {/* Charts */}
+      <div className="space-y-6">
+        {/* Revenue vs Budget */}
+        <RevenueVsBudgetChart
+          data={data.revenueBudget}
+          onBarClick={(ffrdcId) => handleChartClick(ffrdcId, "ytd-revenue")}
+        />
+
+        {/* Charts Grid */}
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Gross Margin Trend */}
+          <GrossMarginChart
+            data={data.marginTrend}
+            ffrdcs={data.ffrdcs}
+            onLineClick={(ffrdcId) => handleChartClick(ffrdcId, "gross-margin")}
           />
 
-          {/* Charts Grid */}
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Gross Margin Trend */}
-            <GrossMarginChart
-              data={data.marginTrend}
-              ffrdcs={data.ffrdcs}
-              onLineClick={(ffrdcId) => handleChartClick(ffrdcId, "gross-margin")}
-            />
-
-            {/* Operating Expense */}
-            <OpexRatioChart data={data.opexTrend} />
-          </div>
-
-          {/* Second Row */}
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Headcount & Utilization */}
-            <HeadcountUtilChart
-              data={data.headcountUtil}
-              onBarClick={(ffrdcId) => handleChartClick(ffrdcId, "headcount-util")}
-            />
-
-            {/* Indirect Cost Rates */}
-            <IndirectRateChart
-              data={data.indirectRates}
-              onBarClick={(ffrdcId) => handleChartClick(ffrdcId, "indirect-rate")}
-            />
-          </div>
-
-          {/* Cash & Working Capital */}
-          <AgingTable cashPosition={data.cashPosition} />
+          {/* Operating Expense */}
+          <OpexRatioChart data={data.opexTrend} />
         </div>
 
-        {/* Signals Sidebar - 1 column */}
-        <div className="lg:col-span-1">
-          <div className="sticky top-24">
-            <SignalsList
-              signals={data.signals}
-              onSignalClick={handleSignalClick}
-              maxItems={10}
-            />
-          </div>
+        {/* Second Row */}
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Headcount & Utilization */}
+          <HeadcountUtilChart
+            data={data.headcountUtil}
+            onBarClick={(ffrdcId) => handleChartClick(ffrdcId, "headcount-util")}
+          />
+
+          {/* Indirect Cost Rates */}
+          <IndirectRateChart
+            data={data.indirectRates}
+            onBarClick={(ffrdcId) => handleChartClick(ffrdcId, "indirect-rate")}
+          />
         </div>
+
+        {/* Cash & Working Capital */}
+        <AgingTable cashPosition={data.cashPosition} />
       </div>
+
+      {/* Governance Signals (moved to bottom to maximize chart width) */}
+      <SignalsList
+        signals={data.signals}
+        onSignalClick={handleSignalClick}
+        maxItems={10}
+      />
 
       {/* Drilldown Drawer */}
       <FFRDCDrilldownDrawer

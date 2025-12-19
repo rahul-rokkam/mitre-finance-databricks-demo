@@ -6,11 +6,10 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Line,
 } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { OpexData } from "../types";
-import { formatCurrency, chartConfig } from "./chart-utils";
+import { chartConfig } from "./chart-utils";
 
 interface OpexRatioChartProps {
   data: OpexData[];
@@ -22,6 +21,14 @@ export function OpexRatioChart({ data }: OpexRatioChartProps) {
     ? ((latestData.actual - latestData.forecast) / latestData.forecast) * 100
     : 0;
 
+  // Expenses: over-forecast/over-budget should read as "bad" (red) in the UI.
+  const varianceColor =
+    varianceVsForecast <= 0
+      ? "text-emerald-600 dark:text-emerald-400"
+      : varianceVsForecast <= 2
+        ? "text-amber-600 dark:text-amber-400"
+        : "text-red-600 dark:text-red-400";
+
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -32,8 +39,8 @@ export function OpexRatioChart({ data }: OpexRatioChartProps) {
           </div>
           <div className="text-right">
             <div className="text-2xl font-bold">${latestData?.actual.toFixed(1)}M</div>
-            <div className={`text-sm ${varianceVsForecast <= 2 ? "text-emerald-600 dark:text-emerald-400" : varianceVsForecast <= 5 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400"}`}>
-              {varianceVsForecast >= 0 ? "+" : ""}{varianceVsForecast.toFixed(1)}% vs forecast
+            <div className={`text-sm ${varianceColor}`}>
+              {varianceVsForecast > 0 ? "+" : ""}{varianceVsForecast.toFixed(1)}% vs forecast
             </div>
           </div>
         </div>

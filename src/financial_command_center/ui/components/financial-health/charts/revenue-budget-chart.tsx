@@ -7,7 +7,6 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
-  ReferenceLine,
 } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { RevenueBudgetByFFRDC } from "../types";
@@ -71,7 +70,8 @@ export function RevenueVsBudgetChart({ data, onBarClick }: RevenueVsBudgetChartP
             />
             <Bar
               dataKey="budget"
-              fill="hsl(var(--muted))"
+              fill="hsl(var(--muted-foreground))"
+              fillOpacity={0.25}
               radius={[4, 4, 0, 0]}
               name="budget"
             />
@@ -82,23 +82,21 @@ export function RevenueVsBudgetChart({ data, onBarClick }: RevenueVsBudgetChartP
               onClick={(data) => onBarClick?.(data.ffrdcId)}
               className="cursor-pointer"
             >
-              {chartData.map((entry, index) => {
-                const status = getBudgetVarianceStatus(entry.variancePercent);
-                const colors = getStatusColorClasses(status);
-                return (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={entry.color}
-                    className="hover:opacity-80 transition-opacity"
-                  />
-                );
-              })}
+              {chartData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={entry.color}
+                  className="hover:opacity-80 transition-opacity"
+                />
+              ))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
         <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
           {data.map((item, index) => {
-            const status = getBudgetVarianceStatus(item.variancePercent);
+            // For revenue, being above budget is generally favorable.
+            const status =
+              item.variancePercent >= 0 ? "green" : getBudgetVarianceStatus(item.variancePercent);
             const colors = getStatusColorClasses(status);
             return (
               <div

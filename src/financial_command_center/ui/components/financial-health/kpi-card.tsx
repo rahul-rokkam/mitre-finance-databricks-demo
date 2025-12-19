@@ -1,7 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown, Minus, ChevronRight } from "lucide-react";
-import { Sparklines, SparklinesLine } from "react-sparklines";
 import type { KpiMetric } from "./types";
 import { StatusPill } from "./status-pill";
 import { formatCurrency, formatPercent } from "./charts/chart-utils";
@@ -74,17 +73,17 @@ export function KpiCard({ kpi, onClick, className }: KpiCardProps) {
 
   // Format delta
   const formattedDelta = (() => {
-    const sign = delta >= 0 ? "+" : "";
+    const sign = delta > 0 ? "+" : delta < 0 ? "-" : "";
     if (unit === "percent" || unit === "ratio") {
-      return `${sign}${delta.toFixed(1)}%`;
+      return `${sign}${Math.abs(delta).toFixed(1)}%`;
     }
     if (unit === "currency") {
       return `${sign}${formatCurrency(Math.abs(delta))}`;
     }
     if (unit === "days") {
-      return `${sign}${delta} days`;
+      return `${sign}${Math.abs(delta)} days`;
     }
-    return `${sign}${delta}`;
+    return `${sign}${Math.abs(delta)}`;
   })();
 
   // Delta trend icon

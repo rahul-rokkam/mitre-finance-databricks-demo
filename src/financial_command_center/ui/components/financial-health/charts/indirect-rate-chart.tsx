@@ -8,7 +8,6 @@ import {
   ResponsiveContainer,
   Cell,
   ReferenceLine,
-  ErrorBar,
 } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { IndirectRateByFFRDC } from "../types";

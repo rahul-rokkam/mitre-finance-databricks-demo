@@ -327,7 +327,7 @@ As of: ${data.asOfDate}`;
               <TableBody>
                 {data.opexTrend.map((item) => {
                   const variance = ((item.actual - item.forecast) / item.forecast) * 100;
-                  const status = getBudgetVarianceStatus(variance);
+                  // Expenses: over-forecast should read as "bad" (red), under-forecast as "good" (green)
                   return (
                     <TableRow key={item.month}>
                       <TableCell className="font-medium">{item.month}</TableCell>
@@ -337,11 +337,11 @@ As of: ${data.asOfDate}`;
                       <TableCell className="text-right">
                         <span
                           className={
-                            variance <= 2
+                            variance <= 0
                               ? "text-emerald-600 dark:text-emerald-400"
-                              : variance <= 5
-                              ? "text-amber-600 dark:text-amber-400"
-                              : "text-red-600 dark:text-red-400"
+                              : variance <= 2
+                                ? "text-amber-600 dark:text-amber-400"
+                                : "text-red-600 dark:text-red-400"
                           }
                         >
                           {variance >= 0 ? "+" : ""}
