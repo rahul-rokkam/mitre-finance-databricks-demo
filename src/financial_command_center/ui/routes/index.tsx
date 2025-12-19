@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/apx/navbar";
-import { User } from "lucide-react";
 import { BubbleBackground } from "@/components/backgrounds/bubble";
 
 export const Route = createFileRoute("/")({
@@ -22,14 +21,18 @@ function Index() {
         {/* Right column - Content */}
         <div className="relative flex flex-col items-center justify-center p-8 md:p-12 border-l">
           <div className="max-w-lg space-y-8 text-center">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold">
-              Welcome to {__APP_NAME__}
-            </h1>
+            <div className="space-y-2">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold">
+                Welcome, Wilson Wang
+              </h1>
+              <p className="text-xl text-muted-foreground">
+                7 years, 0 months, 28 days
+              </p>
+            </div>
 
             <Button size="lg" asChild>
-              <Link to="/profile" className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                View <code>/profile</code>
+              <Link to="/financial-health" className="flex items-center gap-2">
+                Financial Health Dashboard
               </Link>
             </Button>
           </div>
