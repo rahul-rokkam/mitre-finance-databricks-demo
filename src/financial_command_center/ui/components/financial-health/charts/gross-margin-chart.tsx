@@ -53,14 +53,18 @@ export function GrossMarginChart({ data, ffrdcs, onLineClick }: GrossMarginChart
               tickLine={false}
               axisLine={false}
               tickFormatter={(value) => `${value}%`}
-              domain={["dataMin - 1", "dataMax + 1"]}
+              domain={[0, 50]}
+              ticks={[0, 10, 20, 30, 40, 50]}
             />
             <Tooltip
               contentStyle={chartConfig.tooltipStyle}
-              formatter={(value: number, name: string) => [
-                formatPercent(value),
-                ffrdcs.find((f) => f.id === name)?.shortName || name,
-              ]}
+              formatter={(value, name) => {
+                if (typeof value !== "number") return null;
+                return [
+                  formatPercent(value),
+                  ffrdcs.find((f) => f.id === name)?.shortName || name,
+                ];
+              }}
               labelStyle={{ fontWeight: 600, marginBottom: 4 }}
             />
             <Legend

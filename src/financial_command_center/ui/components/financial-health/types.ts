@@ -80,7 +80,6 @@ export interface HeadcountUtilByFFRDC {
 export interface OpexData {
   month: string;
   actual: number;
-  forecast: number;
   budget: number;
 }
 

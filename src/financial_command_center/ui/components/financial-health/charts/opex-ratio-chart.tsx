@@ -1,6 +1,6 @@
 import {
-  AreaChart,
-  Area,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -17,17 +17,15 @@ interface OpexRatioChartProps {
 
 export function OpexRatioChart({ data }: OpexRatioChartProps) {
   const latestData = data[data.length - 1];
-  const varianceVsForecast = latestData
-    ? ((latestData.actual - latestData.forecast) / latestData.forecast) * 100
+  const varianceVsBudget = latestData
+    ? ((latestData.actual - latestData.budget) / latestData.budget) * 100
     : 0;
 
-  // Expenses: over-forecast/over-budget should read as "bad" (red) in the UI.
+  // Expenses: over-budget should read as "bad" (red) in the UI.
   const varianceColor =
-    varianceVsForecast <= 0
+    varianceVsBudget <= 0
       ? "text-emerald-600 dark:text-emerald-400"
-      : varianceVsForecast <= 2
-        ? "text-amber-600 dark:text-amber-400"
-        : "text-red-600 dark:text-red-400";
+      : "text-red-600 dark:text-red-400";
 
   return (
     <Card>
@@ -35,29 +33,19 @@ export function OpexRatioChart({ data }: OpexRatioChartProps) {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-base font-semibold">Operating Expense Trend</CardTitle>
-            <CardDescription>Actual vs forecast operating expenses ($M)</CardDescription>
+            <CardDescription>Actual vs budget operating expenses ($M)</CardDescription>
           </div>
           <div className="text-right">
             <div className="text-2xl font-bold">${latestData?.actual.toFixed(1)}M</div>
             <div className={`text-sm ${varianceColor}`}>
-              {varianceVsForecast > 0 ? "+" : ""}{varianceVsForecast.toFixed(1)}% vs forecast
+              {varianceVsBudget > 0 ? "+" : ""}{varianceVsBudget.toFixed(1)}% vs budget
             </div>
           </div>
         </div>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={280}>
-          <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id="actualGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(221, 83%, 53%)" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="hsl(221, 83%, 53%)" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="forecastGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--muted))" stopOpacity={0.5} />
-                <stop offset="95%" stopColor="hsl(var(--muted))" stopOpacity={0} />
-              </linearGradient>
-            </defs>
+          <LineChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <CartesianGrid {...chartConfig.gridStyle} vertical={false} />
             <XAxis
               dataKey="month"
@@ -70,42 +58,38 @@ export function OpexRatioChart({ data }: OpexRatioChartProps) {
               tickLine={false}
               axisLine={false}
               tickFormatter={(value) => `$${value}M`}
-              domain={["dataMin - 2", "dataMax + 2"]}
+              domain={[0, "dataMax + 5"]}
             />
             <Tooltip
               contentStyle={chartConfig.tooltipStyle}
-              formatter={(value: number, name: string) => [
-                `$${value.toFixed(1)}M`,
-                name === "actual" ? "Actual" : name === "forecast" ? "Forecast" : "Budget",
-              ]}
+              formatter={(value, name) => {
+                if (typeof value !== "number") return null;
+                const label = name === "budget" ? "Budget" : "Actual";
+                return [`$${value.toFixed(1)}M`, label];
+              }}
               labelStyle={{ fontWeight: 600, marginBottom: 4 }}
             />
-            <Area
+            {/* Budget line - gray dotted */}
+            <Line
               type="monotone"
               dataKey="budget"
-              stroke="hsl(var(--muted-foreground))"
-              strokeWidth={1}
-              strokeDasharray="5 5"
-              fill="none"
+              stroke="#888888"
+              strokeWidth={2}
+              strokeDasharray="6 4"
+              dot={false}
               name="budget"
             />
-            <Area
-              type="monotone"
-              dataKey="forecast"
-              stroke="hsl(var(--muted-foreground))"
-              strokeWidth={2}
-              fill="url(#forecastGradient)"
-              name="forecast"
-            />
-            <Area
+            {/* Actual line - solid blue */}
+            <Line
               type="monotone"
               dataKey="actual"
               stroke="hsl(221, 83%, 53%)"
               strokeWidth={2}
-              fill="url(#actualGradient)"
+              dot={{ r: 4, fill: "hsl(221, 83%, 53%)", strokeWidth: 0 }}
+              activeDot={{ r: 6 }}
               name="actual"
             />
-          </AreaChart>
+          </LineChart>
         </ResponsiveContainer>
         <div className="mt-4 flex items-center justify-center gap-6 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
@@ -113,11 +97,7 @@ export function OpexRatioChart({ data }: OpexRatioChartProps) {
             <span>Actual</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-0.5 bg-muted-foreground" />
-            <span>Forecast</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-0.5 border-t border-dashed border-muted-foreground" />
+            <div className="w-4 h-0.5 border-t-2 border-dashed" style={{ borderColor: "#888888" }} />
             <span>Budget</span>
           </div>
         </div>
@@ -125,5 +105,3 @@ export function OpexRatioChart({ data }: OpexRatioChartProps) {
     </Card>
   );
 }
-
-

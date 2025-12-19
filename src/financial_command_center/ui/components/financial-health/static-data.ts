@@ -81,19 +81,20 @@ export const staticFinancialHealthSnapshot: FinancialHealthSnapshot = {
   ],
   revenueBudget: [
     { ffrdcId: "cems", ffrdcName: "CEM", actual: 520000000, budget: 505000000, variance: 15000000, variancePercent: 3.0 },
-    { ffrdcId: "cve", ffrdcName: "CVE", actual: 185000000, budget: 190000000, variance: -5000000, variancePercent: -2.6 },
+    { ffrdcId: "cve", ffrdcName: "CVE", actual: 168000000, budget: 190000000, variance: -22000000, variancePercent: -11.6 }, // Red: significantly below budget
     { ffrdcId: "hssedi", ffrdcName: "HSSEDI", actual: 445000000, budget: 430000000, variance: 15000000, variancePercent: 3.5 },
     { ffrdcId: "jsac", ffrdcName: "JEMC", actual: 125000000, budget: 120000000, variance: 5000000, variancePercent: 4.2 },
     { ffrdcId: "nsc", ffrdcName: "NSEC", actual: 1285000000, budget: 1300000000, variance: -15000000, variancePercent: -1.2 },
-    { ffrdcId: "cms", ffrdcName: "CAMH", actual: 287000000, budget: 280000000, variance: 7000000, variancePercent: 2.5 },
+    { ffrdcId: "cms", ffrdcName: "CAMH", actual: 270000000, budget: 280000000, variance: -10000000, variancePercent: -3.6 }, // Yellow: slightly below budget
   ],
   marginTrend: [
-    { month: "Jul", cems: 29.5, cve: 27.2, hssedi: 28.8, jsac: 26.5, nsc: 30.2, cms: 27.8 },
-    { month: "Aug", cems: 29.3, cve: 27.0, hssedi: 28.6, jsac: 26.3, nsc: 30.0, cms: 27.6 },
-    { month: "Sep", cems: 29.1, cve: 26.8, hssedi: 28.4, jsac: 26.2, nsc: 29.8, cms: 27.5 },
-    { month: "Oct", cems: 28.9, cve: 26.6, hssedi: 28.2, jsac: 26.0, nsc: 29.6, cms: 27.3 },
-    { month: "Nov", cems: 28.7, cve: 26.5, hssedi: 28.1, jsac: 25.9, nsc: 29.5, cms: 27.2 },
-    { month: "Dec", cems: 28.5, cve: 26.4, hssedi: 28.0, jsac: 25.8, nsc: 29.4, cms: 27.1 },
+    // More varied margin data - each FFRDC has distinct trajectory and level
+    { month: "Jul", cems: 32.5, cve: 18.2, hssedi: 28.0, jsac: 12.5, nsc: 38.5, cms: 22.0 },
+    { month: "Aug", cems: 31.0, cve: 15.8, hssedi: 30.5, jsac: 14.2, nsc: 40.2, cms: 20.5 },
+    { month: "Sep", cems: 28.5, cve: 19.5, hssedi: 26.0, jsac: 10.8, nsc: 35.8, cms: 24.2 },
+    { month: "Oct", cems: 30.2, cve: 12.5, hssedi: 32.8, jsac: 16.5, nsc: 42.5, cms: 18.5 },
+    { month: "Nov", cems: 33.8, cve: 20.2, hssedi: 24.5, jsac: 8.2, nsc: 36.0, cms: 26.8 },
+    { month: "Dec", cems: 29.5, cve: 16.8, hssedi: 29.2, jsac: 14.8, nsc: 39.5, cms: 21.5 },
   ],
   marginByFFRDC: [
     {
@@ -200,20 +201,21 @@ export const staticFinancialHealthSnapshot: FinancialHealthSnapshot = {
     ],
   },
   headcountUtil: [
-    { ffrdcId: "cems", ffrdcName: "CEM", headcount: 2450, utilizationPct: 79.2, billableHours: 3880000, totalHours: 4900000 },
-    { ffrdcId: "cve", ffrdcName: "CVE", headcount: 820, utilizationPct: 76.5, billableHours: 1254000, totalHours: 1640000 },
-    { ffrdcId: "hssedi", ffrdcName: "HSSEDI", headcount: 1980, utilizationPct: 80.1, billableHours: 3172000, totalHours: 3960000 },
-    { ffrdcId: "jsac", ffrdcName: "JEMC", headcount: 580, utilizationPct: 74.8, billableHours: 867000, totalHours: 1160000 },
-    { ffrdcId: "nsc", ffrdcName: "NSEC", headcount: 5820, utilizationPct: 81.2, billableHours: 9452000, totalHours: 11640000 },
-    { ffrdcId: "cms", ffrdcName: "CAMH", headcount: 1350, utilizationPct: 77.4, billableHours: 2090000, totalHours: 2700000 },
+    { ffrdcId: "cems", ffrdcName: "CEM", headcount: 2450, utilizationPct: 82.5, billableHours: 4042500, totalHours: 4900000 }, // Green: above target
+    { ffrdcId: "cve", ffrdcName: "CVE", headcount: 820, utilizationPct: 68.2, billableHours: 1118480, totalHours: 1640000 }, // Red: significantly below target
+    { ffrdcId: "hssedi", ffrdcName: "HSSEDI", headcount: 1980, utilizationPct: 81.5, billableHours: 3227400, totalHours: 3960000 }, // Green: above target
+    { ffrdcId: "jsac", ffrdcName: "JEMC", headcount: 580, utilizationPct: 72.1, billableHours: 836360, totalHours: 1160000 }, // Red: significantly below target
+    { ffrdcId: "nsc", ffrdcName: "NSEC", headcount: 5820, utilizationPct: 84.8, billableHours: 9870720, totalHours: 11640000 }, // Green: above target
+    { ffrdcId: "cms", ffrdcName: "CAMH", headcount: 1350, utilizationPct: 76.2, billableHours: 2057400, totalHours: 2700000 }, // Yellow: slightly below target
   ],
   opexTrend: [
-    { month: "Jul", actual: 52.1, forecast: 51.8, budget: 52.0 },
-    { month: "Aug", actual: 51.8, forecast: 51.5, budget: 51.5 },
-    { month: "Sep", actual: 52.4, forecast: 52.0, budget: 52.0 },
-    { month: "Oct", actual: 53.2, forecast: 52.5, budget: 52.5 },
-    { month: "Nov", actual: 52.8, forecast: 52.2, budget: 52.0 },
-    { month: "Dec", actual: 53.5, forecast: 53.0, budget: 53.0 },
+    // Varied actual vs budget - some over, some under
+    { month: "Jul", actual: 50.5, budget: 52.0 }, // Under budget (green)
+    { month: "Aug", actual: 53.2, budget: 51.5 }, // Over budget (red)
+    { month: "Sep", actual: 51.0, budget: 52.0 }, // Under budget (green)
+    { month: "Oct", actual: 54.5, budget: 52.5 }, // Over budget (red)
+    { month: "Nov", actual: 51.2, budget: 52.0 }, // Under budget (green)
+    { month: "Dec", actual: 55.8, budget: 53.0 }, // Over budget (red)
   ],
   indirectRates: [
     { ffrdcId: "cems", ffrdcName: "CEM", actualRate: 41.5, capRate: 43.0, variance: -1.5 },

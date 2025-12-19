@@ -10,18 +10,36 @@ import {
 } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { RevenueBudgetByFFRDC } from "../types";
-import { formatCurrency, CHART_COLORS, chartConfig } from "./chart-utils";
-import { getBudgetVarianceStatus, getStatusColorClasses } from "../status-rules";
+import { formatCurrency, chartConfig } from "./chart-utils";
+import { getStatusColorClasses } from "../status-rules";
 
 interface RevenueVsBudgetChartProps {
   data: RevenueBudgetByFFRDC[];
   onBarClick?: (ffrdcId: string) => void;
 }
 
+// Get bar fill color based on variance: green if >= 0, yellow if -5% to 0%, red if < -5%
+function getVarianceBarColor(variancePercent: number): string {
+  if (variancePercent >= 0) {
+    return "hsl(142, 71%, 45%)"; // Green - above budget
+  } else if (variancePercent >= -5) {
+    return "hsl(45, 93%, 47%)"; // Yellow - slightly below budget
+  } else {
+    return "hsl(0, 84%, 60%)"; // Red - significantly below budget
+  }
+}
+
+// Get status for variance: green if >= 0, yellow if -5% to 0%, red if < -5%
+function getRevenueVarianceStatus(variancePercent: number): "green" | "yellow" | "red" {
+  if (variancePercent >= 0) return "green";
+  if (variancePercent >= -5) return "yellow";
+  return "red";
+}
+
 export function RevenueVsBudgetChart({ data, onBarClick }: RevenueVsBudgetChartProps) {
-  const chartData = data.map((item, index) => ({
+  const chartData = data.map((item) => ({
     ...item,
-    color: CHART_COLORS[index % CHART_COLORS.length],
+    barColor: getVarianceBarColor(item.variancePercent),
   }));
 
   const totalActual = data.reduce((sum, item) => sum + item.actual, 0);
@@ -71,7 +89,7 @@ export function RevenueVsBudgetChart({ data, onBarClick }: RevenueVsBudgetChartP
             <Bar
               dataKey="budget"
               fill="hsl(var(--muted-foreground))"
-              fillOpacity={0.25}
+              fillOpacity={0.5}
               radius={[4, 4, 0, 0]}
               name="budget"
             />
@@ -85,7 +103,7 @@ export function RevenueVsBudgetChart({ data, onBarClick }: RevenueVsBudgetChartP
               {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={entry.color}
+                  fill={entry.barColor}
                   className="hover:opacity-80 transition-opacity"
                 />
               ))}
@@ -93,11 +111,10 @@ export function RevenueVsBudgetChart({ data, onBarClick }: RevenueVsBudgetChartP
           </BarChart>
         </ResponsiveContainer>
         <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
-          {data.map((item, index) => {
-            // For revenue, being above budget is generally favorable.
-            const status =
-              item.variancePercent >= 0 ? "green" : getBudgetVarianceStatus(item.variancePercent);
+          {data.map((item) => {
+            const status = getRevenueVarianceStatus(item.variancePercent);
             const colors = getStatusColorClasses(status);
+            const barColor = getVarianceBarColor(item.variancePercent);
             return (
               <div
                 key={item.ffrdcId}
@@ -106,7 +123,7 @@ export function RevenueVsBudgetChart({ data, onBarClick }: RevenueVsBudgetChartP
               >
                 <div
                   className="w-2 h-2 rounded-full"
-                  style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }}
+                  style={{ backgroundColor: barColor }}
                 />
                 <span className="font-medium">{item.ffrdcName}</span>
                 <span className={colors.text}>
@@ -120,5 +137,3 @@ export function RevenueVsBudgetChart({ data, onBarClick }: RevenueVsBudgetChartP
     </Card>
   );
 }
-
-

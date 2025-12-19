@@ -1,13 +1,16 @@
 bundle:
   name: financial-command-center
 
+workspace:
+  host: https://fevm-treasury-corporate-financial.cloud.databricks.com
+
 sync:
   include:
     - .build
 
 artifacts:
   default:
-    build: uv run apx build
+    build: uv run python -m apx build
 
 resources:
   apps:
