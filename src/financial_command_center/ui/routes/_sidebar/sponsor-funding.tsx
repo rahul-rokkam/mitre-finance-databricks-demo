@@ -1,4 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Suspense } from "react";
+import { QueryErrorResetBoundary } from "@tanstack/react-query";
+import { ErrorBoundary } from "react-error-boundary";
 import {
   Card,
   CardContent,
@@ -6,68 +9,196 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { DollarSign } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AlertCircle } from "lucide-react";
+import { SponsorFundingContent } from "@/components/sponsor-funding/sponsor-funding-content";
 
 export const Route = createFileRoute("/_sidebar/sponsor-funding")({
   component: () => <SponsorFunding />,
 });
 
-function SponsorFunding() {
+function SponsorFundingSkeleton() {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          Sponsor Funding & Cost Stewardship
-        </h1>
-        <p className="text-muted-foreground">
-          Track sponsor funding and ensure cost-effective mission delivery
-        </p>
+    <div className="space-y-8">
+      {/* Header Skeleton */}
+      <div className="space-y-2">
+        <Skeleton className="h-8 w-96" />
+        <Skeleton className="h-4 w-[500px]" />
       </div>
 
-      <Card className="border-dashed">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <DollarSign className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                Coming Soon
-                <Badge variant="secondary">In Development</Badge>
-              </CardTitle>
-              <CardDescription>
-                This module is currently under development and will be available soon.
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            The Sponsor Funding module will provide comprehensive tracking including:
-          </p>
-          <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-            <li className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              Funding allocation by sponsor
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              Cost stewardship metrics
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              Budget utilization tracking
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              Sponsor relationship management
-            </li>
-          </ul>
-        </CardContent>
-      </Card>
+      {/* Controls Skeleton */}
+      <div className="flex items-center justify-between">
+        <div className="flex gap-3">
+          <Skeleton className="h-10 w-48" />
+          <Skeleton className="h-10 w-44" />
+          <Skeleton className="h-10 w-36" />
+          <Skeleton className="h-6 w-32" />
+        </div>
+      </div>
+
+      {/* Summary KPI Cards Skeleton */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i}>
+            <CardHeader className="pb-2">
+              <Skeleton className="h-4 w-24" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-8 w-20 mb-2" />
+              <Skeleton className="h-3 w-28" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Section 1: Cost Stewardship Skeleton */}
+      <div className="space-y-4">
+        <Skeleton className="h-6 w-64" />
+        {/* Scorecard Table Skeleton */}
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-5 w-48" />
+            <Skeleton className="h-4 w-80" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-64 w-full" />
+          </CardContent>
+        </Card>
+        {/* Charts */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {[1, 2].map((i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-5 w-48" />
+                <Skeleton className="h-4 w-32" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-64 w-full" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        <div className="grid gap-6 lg:grid-cols-2">
+          {[1, 2].map((i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-5 w-44" />
+                <Skeleton className="h-4 w-28" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-52 w-full" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Section 2: Efficiency Skeleton */}
+      <div className="space-y-4">
+        <Skeleton className="h-6 w-48" />
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-5 w-56" />
+            <Skeleton className="h-4 w-40" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-64 w-full" />
+          </CardContent>
+        </Card>
+        <div className="grid gap-6 lg:grid-cols-2">
+          {[1, 2].map((i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-5 w-40" />
+                <Skeleton className="h-4 w-32" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-64 w-full" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Section 3: Health Skeleton */}
+      <div className="space-y-4">
+        <Skeleton className="h-6 w-72" />
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-5 w-64" />
+            <Skeleton className="h-4 w-48" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-56 w-full" />
+          </CardContent>
+        </Card>
+        <div className="grid gap-6 lg:grid-cols-2">
+          {[1, 2].map((i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-5 w-44" />
+                <Skeleton className="h-4 w-36" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-64 w-full" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Section 4: Renewals Skeleton */}
+      <div className="space-y-4">
+        <Skeleton className="h-6 w-56" />
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-5 w-52" />
+            <Skeleton className="h-4 w-40" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-72 w-full" />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
 
-
+function SponsorFunding() {
+  return (
+    <QueryErrorResetBoundary>
+      {({ reset }) => (
+        <ErrorBoundary
+          onReset={reset}
+          fallbackRender={({ resetErrorBoundary }) => (
+            <Card className="border-destructive/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-destructive">
+                  <AlertCircle className="h-5 w-5" />
+                  Failed to Load Sponsor Funding Data
+                </CardTitle>
+                <CardDescription>
+                  There was an error loading the sponsor funding and cost stewardship data. Please
+                  try again or contact support if the issue persists.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex gap-2">
+                <Button variant="outline" onClick={resetErrorBoundary}>
+                  Try Again
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link to="/">Go Home</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        >
+          <Suspense fallback={<SponsorFundingSkeleton />}>
+            <SponsorFundingContent />
+          </Suspense>
+        </ErrorBoundary>
+      )}
+    </QueryErrorResetBoundary>
+  );
+}
