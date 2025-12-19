@@ -1,0 +1,44 @@
+[project]
+name = "financial-command-center"
+dynamic = ["version"]
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.119.0",
+    "pydantic-settings>=2.11.0",
+    "uvicorn>=0.37.0",
+    "databricks-sdk>=0.74.0",
+]
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.406",
+]
+
+[tool.apx.metadata]
+app-name = "financial-command-center"
+app-slug = "financial_command_center"
+app-module = "financial_command_center.backend.app:app"
+metadata-path = "src/financial_command_center/_metadata.py"
+
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning>=0.7.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.uv-dynamic-versioning]
+vcs = "git"
+format-jinja = "{{version}}"
+
+[tool.hatch.build.hooks.version]
+path = "src/financial_command_center/_version.py"
+template = '''
+version = "{version}"
+'''
+
+[tool.hatch.build]
+artifacts = ["src/financial_command_center/__dist__", "src/financial_command_center/_metadata.py"]
+exclude = ["src/financial_command_center/ui"]

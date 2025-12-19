@@ -1,0 +1,1 @@
+command: ["uvicorn", "financial_command_center.backend.app:app", "--workers", "2"]
