@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle } from "lucide-react";
 import { SponsorFundingContent } from "@/components/sponsor-funding/sponsor-funding-content";
+import { GenieChatButton } from "@/components/chat";
 
 export const Route = createFileRoute("/_sidebar/sponsor-funding")({
   component: () => <SponsorFunding />,
@@ -167,38 +168,41 @@ function SponsorFundingSkeleton() {
 
 function SponsorFunding() {
   return (
-    <QueryErrorResetBoundary>
-      {({ reset }) => (
-        <ErrorBoundary
-          onReset={reset}
-          fallbackRender={({ resetErrorBoundary }) => (
-            <Card className="border-destructive/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-destructive">
-                  <AlertCircle className="h-5 w-5" />
-                  Failed to Load Sponsor Funding Data
-                </CardTitle>
-                <CardDescription>
-                  There was an error loading the sponsor funding and cost stewardship data. Please
-                  try again or contact support if the issue persists.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex gap-2">
-                <Button variant="outline" onClick={resetErrorBoundary}>
-                  Try Again
-                </Button>
-                <Button variant="outline" asChild>
-                  <Link to="/">Go Home</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        >
-          <Suspense fallback={<SponsorFundingSkeleton />}>
-            <SponsorFundingContent />
-          </Suspense>
-        </ErrorBoundary>
-      )}
-    </QueryErrorResetBoundary>
+    <>
+      <QueryErrorResetBoundary>
+        {({ reset }) => (
+          <ErrorBoundary
+            onReset={reset}
+            fallbackRender={({ resetErrorBoundary }) => (
+              <Card className="border-destructive/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-destructive">
+                    <AlertCircle className="h-5 w-5" />
+                    Failed to Load Sponsor Funding Data
+                  </CardTitle>
+                  <CardDescription>
+                    There was an error loading the sponsor funding and cost stewardship data. Please
+                    try again or contact support if the issue persists.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex gap-2">
+                  <Button variant="outline" onClick={resetErrorBoundary}>
+                    Try Again
+                  </Button>
+                  <Button variant="outline" asChild>
+                    <Link to="/">Go Home</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          >
+            <Suspense fallback={<SponsorFundingSkeleton />}>
+              <SponsorFundingContent />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+      </QueryErrorResetBoundary>
+      <GenieChatButton schema="sponsor-funding" />
+    </>
   );
 }

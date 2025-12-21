@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle } from "lucide-react";
 import { ProgramPortfolioContent } from "@/components/program-portfolio/program-portfolio-content";
+import { GenieChatButton } from "@/components/chat";
 
 export const Route = createFileRoute("/_sidebar/program-portfolio")({
   component: () => <ProgramPortfolio />,
@@ -114,38 +115,41 @@ function ProgramPortfolioSkeleton() {
 
 function ProgramPortfolio() {
   return (
-    <QueryErrorResetBoundary>
-      {({ reset }) => (
-        <ErrorBoundary
-          onReset={reset}
-          fallbackRender={({ resetErrorBoundary }) => (
-            <Card className="border-destructive/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-destructive">
-                  <AlertCircle className="h-5 w-5" />
-                  Failed to Load Portfolio Data
-                </CardTitle>
-                <CardDescription>
-                  There was an error loading the program portfolio data. Please
-                  try again or contact support if the issue persists.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex gap-2">
-                <Button variant="outline" onClick={resetErrorBoundary}>
-                  Try Again
-                </Button>
-                <Button variant="outline" asChild>
-                  <Link to="/">Go Home</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        >
-          <Suspense fallback={<ProgramPortfolioSkeleton />}>
-            <ProgramPortfolioContent />
-          </Suspense>
-        </ErrorBoundary>
-      )}
-    </QueryErrorResetBoundary>
+    <>
+      <QueryErrorResetBoundary>
+        {({ reset }) => (
+          <ErrorBoundary
+            onReset={reset}
+            fallbackRender={({ resetErrorBoundary }) => (
+              <Card className="border-destructive/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-destructive">
+                    <AlertCircle className="h-5 w-5" />
+                    Failed to Load Portfolio Data
+                  </CardTitle>
+                  <CardDescription>
+                    There was an error loading the program portfolio data. Please
+                    try again or contact support if the issue persists.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex gap-2">
+                  <Button variant="outline" onClick={resetErrorBoundary}>
+                    Try Again
+                  </Button>
+                  <Button variant="outline" asChild>
+                    <Link to="/">Go Home</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          >
+            <Suspense fallback={<ProgramPortfolioSkeleton />}>
+              <ProgramPortfolioContent />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+      </QueryErrorResetBoundary>
+      <GenieChatButton schema="program-portfolio" />
+    </>
   );
 }

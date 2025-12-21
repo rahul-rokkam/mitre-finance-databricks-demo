@@ -1,1 +1,15 @@
 command: ["uvicorn", "financial_command_center.backend.app:app", "--workers", "2"]
+
+env:
+  # Genie Space IDs for each schema
+  # Replace these placeholder values with your actual Genie Space IDs
+  - name: FINANCIAL_COMMAND_CENTER_GENIE_SPACE_FINANCIAL_HEALTH
+    value: "YOUR_FINANCIAL_HEALTH_SPACE_ID"
+  - name: FINANCIAL_COMMAND_CENTER_GENIE_SPACE_PROGRAM_PORTFOLIO
+    value: "YOUR_PROGRAM_PORTFOLIO_SPACE_ID"
+  - name: FINANCIAL_COMMAND_CENTER_GENIE_SPACE_SPONSOR_FUNDING
+    value: "YOUR_SPONSOR_FUNDING_SPACE_ID"
+  - name: FINANCIAL_COMMAND_CENTER_GENIE_SPACE_RISK_COMPLIANCE
+    value: "YOUR_RISK_COMPLIANCE_SPACE_ID"
+  - name: FINANCIAL_COMMAND_CENTER_GENIE_SPACE_GOVERNMENT_RELATIONS
+    value: "YOUR_GOVERNMENT_RELATIONS_SPACE_ID"

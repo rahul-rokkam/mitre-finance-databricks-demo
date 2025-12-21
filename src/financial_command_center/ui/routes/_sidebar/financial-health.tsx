@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle } from "lucide-react";
 import { FinancialHealthContent } from "@/components/financial-health/financial-health-content";
+import { GenieChatButton } from "@/components/chat";
 
 export const Route = createFileRoute("/_sidebar/financial-health")({
   component: () => <FinancialHealth />,
@@ -68,39 +69,42 @@ function FinancialHealthSkeleton() {
 
 function FinancialHealth() {
   return (
-    <QueryErrorResetBoundary>
-      {({ reset }) => (
-        <ErrorBoundary
-          onReset={reset}
-          fallbackRender={({ resetErrorBoundary }) => (
-            <Card className="border-destructive/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-destructive">
-                  <AlertCircle className="h-5 w-5" />
-                  Failed to Load Financial Data
-                </CardTitle>
-                <CardDescription>
-                  There was an error loading the financial health snapshot. Please
-                  try again or contact support if the issue persists.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex gap-2">
-                <Button variant="outline" onClick={resetErrorBoundary}>
-                  Try Again
-                </Button>
-                <Button variant="outline" asChild>
-                  <Link to="/">Go Home</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        >
-          <Suspense fallback={<FinancialHealthSkeleton />}>
-            <FinancialHealthContent />
-          </Suspense>
-        </ErrorBoundary>
-      )}
-    </QueryErrorResetBoundary>
+    <>
+      <QueryErrorResetBoundary>
+        {({ reset }) => (
+          <ErrorBoundary
+            onReset={reset}
+            fallbackRender={({ resetErrorBoundary }) => (
+              <Card className="border-destructive/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-destructive">
+                    <AlertCircle className="h-5 w-5" />
+                    Failed to Load Financial Data
+                  </CardTitle>
+                  <CardDescription>
+                    There was an error loading the financial health snapshot. Please
+                    try again or contact support if the issue persists.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex gap-2">
+                  <Button variant="outline" onClick={resetErrorBoundary}>
+                    Try Again
+                  </Button>
+                  <Button variant="outline" asChild>
+                    <Link to="/">Go Home</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          >
+            <Suspense fallback={<FinancialHealthSkeleton />}>
+              <FinancialHealthContent />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+      </QueryErrorResetBoundary>
+      <GenieChatButton schema="financial-health" />
+    </>
   );
 }
 
