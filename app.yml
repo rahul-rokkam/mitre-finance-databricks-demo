@@ -1,15 +1,18 @@
 command: ["uvicorn", "financial_command_center.backend.app:app", "--workers", "2"]
 
+# Enable user impersonation to pass OBO tokens
+permissions:
+  - user_access_token
+
 env:
   # Genie Space IDs for each schema
-  # Replace these placeholder values with your actual Genie Space IDs
   - name: FINANCIAL_COMMAND_CENTER_GENIE_SPACE_FINANCIAL_HEALTH
-    value: "YOUR_FINANCIAL_HEALTH_SPACE_ID"
+    value: "01f0dec4f3971e7cac39a1c9e71eb1da"
   - name: FINANCIAL_COMMAND_CENTER_GENIE_SPACE_PROGRAM_PORTFOLIO
-    value: "YOUR_PROGRAM_PORTFOLIO_SPACE_ID"
+    value: "01f0dec4f3ea120184ddd4d23bf81627"
   - name: FINANCIAL_COMMAND_CENTER_GENIE_SPACE_SPONSOR_FUNDING
-    value: "YOUR_SPONSOR_FUNDING_SPACE_ID"
+    value: "01f0dec4f43318128fed86372124f817"
   - name: FINANCIAL_COMMAND_CENTER_GENIE_SPACE_RISK_COMPLIANCE
-    value: "YOUR_RISK_COMPLIANCE_SPACE_ID"
+    value: "01f0dec4f47c1df2968ca069d03aad24"
   - name: FINANCIAL_COMMAND_CENTER_GENIE_SPACE_GOVERNMENT_RELATIONS
-    value: "YOUR_GOVERNMENT_RELATIONS_SPACE_ID"
+    value: "01f0dec4f4c3162fa63ab11239ff4e1b"

@@ -4,15 +4,18 @@
  * financial-command-center
  * OpenAPI spec version: 0.1.0
  */
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
+  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
   UseSuspenseQueryOptions,
@@ -40,6 +43,106 @@ export interface ComplexValue {
   value?: ComplexValueValue;
 }
 
+/**
+ * Existing conversation ID for follow-ups
+ */
+export type GenieMessageInConversationId = string | null;
+
+/**
+ * Input for sending a message to Genie
+ */
+export interface GenieMessageIn {
+  /** The schema to query */
+  schema_name: SchemaType;
+  /** The user's question */
+  message: string;
+  /** Existing conversation ID for follow-ups */
+  conversation_id?: GenieMessageInConversationId;
+}
+
+export type GenieMessageOutStatus =
+  (typeof GenieMessageOutStatus)[keyof typeof GenieMessageOutStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GenieMessageOutStatus = {
+  pending: "pending",
+  completed: "completed",
+  failed: "failed",
+} as const;
+
+export type GenieMessageOutQueryResult = GenieQueryResult | null;
+
+export type GenieMessageOutError = string | null;
+
+/**
+ * Response from Genie
+ */
+export interface GenieMessageOut {
+  conversation_id: string;
+  message_id: string;
+  response: string;
+  status: GenieMessageOutStatus;
+  query_result?: GenieMessageOutQueryResult;
+  error?: GenieMessageOutError;
+}
+
+export type GenieQueryResultSql = string | null;
+
+/**
+ * Query result from Genie
+ */
+export interface GenieQueryResult {
+  columns?: string[];
+  rows?: unknown[][];
+  sql?: GenieQueryResultSql;
+}
+
+/**
+ * Configuration for a Genie space
+ */
+export interface GenieSpaceConfigOut {
+  schema_name: string;
+  space_id: string;
+  display_name: string;
+}
+
+export type GenieSpacesOutSpaces = { [key: string]: GenieSpaceConfigOut };
+
+/**
+ * All configured Genie spaces
+ */
+export interface GenieSpacesOut {
+  spaces: GenieSpacesOutSpaces;
+}
+
+export type GenieStatusOutStatus =
+  (typeof GenieStatusOutStatus)[keyof typeof GenieStatusOutStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GenieStatusOutStatus = {
+  pending: "pending",
+  completed: "completed",
+  failed: "failed",
+} as const;
+
+export type GenieStatusOutResponse = string | null;
+
+export type GenieStatusOutQueryResult = GenieQueryResult | null;
+
+export type GenieStatusOutError = string | null;
+
+/**
+ * Status of a Genie message
+ */
+export interface GenieStatusOut {
+  conversation_id: string;
+  message_id: string;
+  status: GenieStatusOutStatus;
+  response?: GenieStatusOutResponse;
+  query_result?: GenieStatusOutQueryResult;
+  error?: GenieStatusOutError;
+}
+
 export interface HTTPValidationError {
   detail?: ValidationError[];
 }
@@ -52,6 +155,17 @@ export interface Name {
   family_name?: NameFamilyName;
   given_name?: NameGivenName;
 }
+
+export type SchemaType = (typeof SchemaType)[keyof typeof SchemaType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const SchemaType = {
+  "financial-health": "financial-health",
+  "program-portfolio": "program-portfolio",
+  "sponsor-funding": "sponsor-funding",
+  "risk-compliance": "risk-compliance",
+  "government-relations": "government-relations",
+} as const;
 
 export type UserActive = boolean | null;
 
@@ -110,6 +224,10 @@ export interface ValidationError {
 export interface VersionOut {
   version: string;
 }
+
+export type GetGenieMessageStatusParams = {
+  schema_name: SchemaType;
+};
 
 /**
  * @summary Version
@@ -600,6 +718,692 @@ export function useCurrentUserSuspense<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getCurrentUserSuspenseQueryOptions(options);
+
+  const query = useSuspenseQuery(
+    queryOptions,
+    queryClient,
+  ) as UseSuspenseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * Get all configured Genie spaces
+ * @summary Get Genie Spaces
+ */
+export const getGenieSpaces = (
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<GenieSpacesOut>> => {
+  return axios.default.get(`/api/genie/spaces`, options);
+};
+
+export const getGetGenieSpacesQueryKey = () => {
+  return [`/api/genie/spaces`] as const;
+};
+
+export const getGetGenieSpacesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getGenieSpaces>>,
+  TError = AxiosError<unknown>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getGenieSpaces>>, TError, TData>
+  >;
+  axios?: AxiosRequestConfig;
+}) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetGenieSpacesQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getGenieSpaces>>> = ({
+    signal,
+  }) => getGenieSpaces({ signal, ...axiosOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getGenieSpaces>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetGenieSpacesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getGenieSpaces>>
+>;
+export type GetGenieSpacesQueryError = AxiosError<unknown>;
+
+export function useGetGenieSpaces<
+  TData = Awaited<ReturnType<typeof getGenieSpaces>>,
+  TError = AxiosError<unknown>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getGenieSpaces>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getGenieSpaces>>,
+          TError,
+          Awaited<ReturnType<typeof getGenieSpaces>>
+        >,
+        "initialData"
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetGenieSpaces<
+  TData = Awaited<ReturnType<typeof getGenieSpaces>>,
+  TError = AxiosError<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getGenieSpaces>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getGenieSpaces>>,
+          TError,
+          Awaited<ReturnType<typeof getGenieSpaces>>
+        >,
+        "initialData"
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetGenieSpaces<
+  TData = Awaited<ReturnType<typeof getGenieSpaces>>,
+  TError = AxiosError<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getGenieSpaces>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get Genie Spaces
+ */
+
+export function useGetGenieSpaces<
+  TData = Awaited<ReturnType<typeof getGenieSpaces>>,
+  TError = AxiosError<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getGenieSpaces>>, TError, TData>
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetGenieSpacesQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const getGetGenieSpacesSuspenseQueryOptions = <
+  TData = Awaited<ReturnType<typeof getGenieSpaces>>,
+  TError = AxiosError<unknown>,
+>(options?: {
+  query?: Partial<
+    UseSuspenseQueryOptions<
+      Awaited<ReturnType<typeof getGenieSpaces>>,
+      TError,
+      TData
+    >
+  >;
+  axios?: AxiosRequestConfig;
+}) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetGenieSpacesQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getGenieSpaces>>> = ({
+    signal,
+  }) => getGenieSpaces({ signal, ...axiosOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseSuspenseQueryOptions<
+    Awaited<ReturnType<typeof getGenieSpaces>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetGenieSpacesSuspenseQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getGenieSpaces>>
+>;
+export type GetGenieSpacesSuspenseQueryError = AxiosError<unknown>;
+
+export function useGetGenieSpacesSuspense<
+  TData = Awaited<ReturnType<typeof getGenieSpaces>>,
+  TError = AxiosError<unknown>,
+>(
+  options: {
+    query: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof getGenieSpaces>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseSuspenseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetGenieSpacesSuspense<
+  TData = Awaited<ReturnType<typeof getGenieSpaces>>,
+  TError = AxiosError<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof getGenieSpaces>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseSuspenseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetGenieSpacesSuspense<
+  TData = Awaited<ReturnType<typeof getGenieSpaces>>,
+  TError = AxiosError<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof getGenieSpaces>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseSuspenseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get Genie Spaces
+ */
+
+export function useGetGenieSpacesSuspense<
+  TData = Awaited<ReturnType<typeof getGenieSpaces>>,
+  TError = AxiosError<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof getGenieSpaces>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseSuspenseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetGenieSpacesSuspenseQueryOptions(options);
+
+  const query = useSuspenseQuery(
+    queryOptions,
+    queryClient,
+  ) as UseSuspenseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * Send a message to the Genie space and wait for response
+ * @summary Send Genie Message
+ */
+export const sendGenieMessage = (
+  genieMessageIn: GenieMessageIn,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<GenieMessageOut>> => {
+  return axios.default.post(`/api/genie/message`, genieMessageIn, options);
+};
+
+export const getSendGenieMessageMutationOptions = <
+  TError = AxiosError<HTTPValidationError>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof sendGenieMessage>>,
+    TError,
+    { data: GenieMessageIn },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof sendGenieMessage>>,
+  TError,
+  { data: GenieMessageIn },
+  TContext
+> => {
+  const mutationKey = ["sendGenieMessage"];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof sendGenieMessage>>,
+    { data: GenieMessageIn }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return sendGenieMessage(data, axiosOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SendGenieMessageMutationResult = NonNullable<
+  Awaited<ReturnType<typeof sendGenieMessage>>
+>;
+export type SendGenieMessageMutationBody = GenieMessageIn;
+export type SendGenieMessageMutationError = AxiosError<HTTPValidationError>;
+
+/**
+ * @summary Send Genie Message
+ */
+export const useSendGenieMessage = <
+  TError = AxiosError<HTTPValidationError>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof sendGenieMessage>>,
+      TError,
+      { data: GenieMessageIn },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof sendGenieMessage>>,
+  TError,
+  { data: GenieMessageIn },
+  TContext
+> => {
+  const mutationOptions = getSendGenieMessageMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Get the status of a Genie message
+ * @summary Get Genie Message Status
+ */
+export const getGenieMessageStatus = (
+  conversationId: string,
+  messageId: string,
+  params: GetGenieMessageStatusParams,
+  options?: AxiosRequestConfig,
+): Promise<AxiosResponse<GenieStatusOut>> => {
+  return axios.default.get(`/api/genie/status/${conversationId}/${messageId}`, {
+    ...options,
+    params: { ...params, ...options?.params },
+  });
+};
+
+export const getGetGenieMessageStatusQueryKey = (
+  conversationId?: string,
+  messageId?: string,
+  params?: GetGenieMessageStatusParams,
+) => {
+  return [
+    `/api/genie/status/${conversationId}/${messageId}`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetGenieMessageStatusQueryOptions = <
+  TData = Awaited<ReturnType<typeof getGenieMessageStatus>>,
+  TError = AxiosError<HTTPValidationError>,
+>(
+  conversationId: string,
+  messageId: string,
+  params: GetGenieMessageStatusParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getGenieMessageStatus>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetGenieMessageStatusQueryKey(conversationId, messageId, params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getGenieMessageStatus>>
+  > = ({ signal }) =>
+    getGenieMessageStatus(conversationId, messageId, params, {
+      signal,
+      ...axiosOptions,
+    });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!(conversationId && messageId),
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getGenieMessageStatus>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetGenieMessageStatusQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getGenieMessageStatus>>
+>;
+export type GetGenieMessageStatusQueryError = AxiosError<HTTPValidationError>;
+
+export function useGetGenieMessageStatus<
+  TData = Awaited<ReturnType<typeof getGenieMessageStatus>>,
+  TError = AxiosError<HTTPValidationError>,
+>(
+  conversationId: string,
+  messageId: string,
+  params: GetGenieMessageStatusParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getGenieMessageStatus>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getGenieMessageStatus>>,
+          TError,
+          Awaited<ReturnType<typeof getGenieMessageStatus>>
+        >,
+        "initialData"
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetGenieMessageStatus<
+  TData = Awaited<ReturnType<typeof getGenieMessageStatus>>,
+  TError = AxiosError<HTTPValidationError>,
+>(
+  conversationId: string,
+  messageId: string,
+  params: GetGenieMessageStatusParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getGenieMessageStatus>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getGenieMessageStatus>>,
+          TError,
+          Awaited<ReturnType<typeof getGenieMessageStatus>>
+        >,
+        "initialData"
+      >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetGenieMessageStatus<
+  TData = Awaited<ReturnType<typeof getGenieMessageStatus>>,
+  TError = AxiosError<HTTPValidationError>,
+>(
+  conversationId: string,
+  messageId: string,
+  params: GetGenieMessageStatusParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getGenieMessageStatus>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get Genie Message Status
+ */
+
+export function useGetGenieMessageStatus<
+  TData = Awaited<ReturnType<typeof getGenieMessageStatus>>,
+  TError = AxiosError<HTTPValidationError>,
+>(
+  conversationId: string,
+  messageId: string,
+  params: GetGenieMessageStatusParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getGenieMessageStatus>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetGenieMessageStatusQueryOptions(
+    conversationId,
+    messageId,
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const getGetGenieMessageStatusSuspenseQueryOptions = <
+  TData = Awaited<ReturnType<typeof getGenieMessageStatus>>,
+  TError = AxiosError<HTTPValidationError>,
+>(
+  conversationId: string,
+  messageId: string,
+  params: GetGenieMessageStatusParams,
+  options?: {
+    query?: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof getGenieMessageStatus>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+) => {
+  const { query: queryOptions, axios: axiosOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetGenieMessageStatusQueryKey(conversationId, messageId, params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getGenieMessageStatus>>
+  > = ({ signal }) =>
+    getGenieMessageStatus(conversationId, messageId, params, {
+      signal,
+      ...axiosOptions,
+    });
+
+  return { queryKey, queryFn, ...queryOptions } as UseSuspenseQueryOptions<
+    Awaited<ReturnType<typeof getGenieMessageStatus>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetGenieMessageStatusSuspenseQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getGenieMessageStatus>>
+>;
+export type GetGenieMessageStatusSuspenseQueryError =
+  AxiosError<HTTPValidationError>;
+
+export function useGetGenieMessageStatusSuspense<
+  TData = Awaited<ReturnType<typeof getGenieMessageStatus>>,
+  TError = AxiosError<HTTPValidationError>,
+>(
+  conversationId: string,
+  messageId: string,
+  params: GetGenieMessageStatusParams,
+  options: {
+    query: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof getGenieMessageStatus>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseSuspenseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetGenieMessageStatusSuspense<
+  TData = Awaited<ReturnType<typeof getGenieMessageStatus>>,
+  TError = AxiosError<HTTPValidationError>,
+>(
+  conversationId: string,
+  messageId: string,
+  params: GetGenieMessageStatusParams,
+  options?: {
+    query?: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof getGenieMessageStatus>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseSuspenseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetGenieMessageStatusSuspense<
+  TData = Awaited<ReturnType<typeof getGenieMessageStatus>>,
+  TError = AxiosError<HTTPValidationError>,
+>(
+  conversationId: string,
+  messageId: string,
+  params: GetGenieMessageStatusParams,
+  options?: {
+    query?: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof getGenieMessageStatus>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseSuspenseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+/**
+ * @summary Get Genie Message Status
+ */
+
+export function useGetGenieMessageStatusSuspense<
+  TData = Awaited<ReturnType<typeof getGenieMessageStatus>>,
+  TError = AxiosError<HTTPValidationError>,
+>(
+  conversationId: string,
+  messageId: string,
+  params: GetGenieMessageStatusParams,
+  options?: {
+    query?: Partial<
+      UseSuspenseQueryOptions<
+        Awaited<ReturnType<typeof getGenieMessageStatus>>,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  },
+  queryClient?: QueryClient,
+): UseSuspenseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetGenieMessageStatusSuspenseQueryOptions(
+    conversationId,
+    messageId,
+    params,
+    options,
+  );
 
   const query = useSuspenseQuery(
     queryOptions,

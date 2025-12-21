@@ -25,3 +25,20 @@ def get_obo_ws(
     return WorkspaceClient(
         token=token, auth_type="pat"
     )  # set pat explicitly to avoid issues with SP client
+
+
+def get_ws_with_fallback(
+    token: Annotated[str | None, Header(alias="X-Forwarded-Access-Token")] = None,
+) -> WorkspaceClient:
+    """
+    Returns a Databricks Workspace client.
+    Uses OBO token if available, otherwise falls back to service principal credentials.
+    
+    This is useful for endpoints that can work with either user or SP authentication,
+    such as Genie API calls where the SP has been granted access to the Genie spaces.
+    """
+    if token:
+        return WorkspaceClient(token=token, auth_type="pat")
+    
+    # Fallback to default authentication (service principal in Databricks Apps)
+    return WorkspaceClient()

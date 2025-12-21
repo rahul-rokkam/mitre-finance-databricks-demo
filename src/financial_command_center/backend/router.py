@@ -14,7 +14,7 @@ from .models import (
 from databricks.sdk import WorkspaceClient
 from databricks.sdk.service.iam import User as UserOut
 from databricks.sdk.service.dashboards import GenieMessage
-from .dependencies import get_obo_ws
+from .dependencies import get_obo_ws, get_ws_with_fallback
 from .config import conf
 
 api = APIRouter(prefix=conf.api_prefix)
@@ -26,7 +26,7 @@ async def version():
 
 
 @api.get("/current-user", response_model=UserOut, operation_id="currentUser")
-def me(obo_ws: Annotated[WorkspaceClient, Depends(get_obo_ws)]):
+def me(obo_ws: Annotated[WorkspaceClient, Depends(get_ws_with_fallback)]):
     return obo_ws.current_user.me()
 
 
@@ -43,7 +43,7 @@ def get_genie_spaces():
 @api.post("/genie/message", response_model=GenieMessageOut, operation_id="sendGenieMessage")
 def send_genie_message(
     request: GenieMessageIn,
-    obo_ws: Annotated[WorkspaceClient, Depends(get_obo_ws)],
+    obo_ws: Annotated[WorkspaceClient, Depends(get_ws_with_fallback)],
 ):
     """Send a message to the Genie space and wait for response"""
     space_id = conf.get_genie_space_id(request.schema_name.value)
@@ -86,7 +86,7 @@ def get_genie_message_status(
     conversation_id: str,
     message_id: str,
     schema_name: SchemaType,
-    obo_ws: Annotated[WorkspaceClient, Depends(get_obo_ws)],
+    obo_ws: Annotated[WorkspaceClient, Depends(get_ws_with_fallback)],
 ):
     """Get the status of a Genie message"""
     space_id = conf.get_genie_space_id(schema_name.value)
